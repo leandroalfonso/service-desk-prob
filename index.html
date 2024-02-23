@@ -26,6 +26,11 @@
           
             margin-left: 10px;
         }
+        .navbar a {
+            float: right;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
         body {
             background-color: #f0f0f0;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -93,7 +98,8 @@
 
 <body>
     <div class="navbar">
-        <h5>Relatos de Solução de Problema</h5>
+        <h5>Adiocionar Solução</h5>
+        <a class="btn btn-outline-light" href="/lista">Lista de Soluções</a>
     </div>
     <div class="container">
         <div class="row">
@@ -119,7 +125,7 @@
 
                     </div>
                     <button class="btn btn-primary" onclick="enviarDados()">Enviar Dados</button>
-                    <a class="btn btn-secondary" href="/lista">Lista</a>
+                    
                     <p id="mensagem"></p>
                 </div>
             </div>

@@ -19,15 +19,16 @@
             justify-content: space-between;
         }
 
-        .navbar {
-            background-color: #8c30b1;
-            color: #fff;
-            height: 60px;
-            width: 100%;
-            text-align: center;
+       .navbar {
+        background-color: #8c30b1;
+        color: #fff;
+        height: 60px;
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+}
 
-
-        }
         .input-group {
             margin-top: 20px;
         }
@@ -35,6 +36,10 @@
         .navbar h5 {
 
             margin-left: 10px;
+        }
+        .navbar a {
+            margin-right: 10px;
+            margin-bottom: 10px;
         }
 
         .navbar-brand {
@@ -116,7 +121,8 @@
 <body>
     <nav class="navbar navbar-dark">
 
-        <h5 class="navbar-brand mb-4">Relatos de Solução de Problema</h5>
+        <h5 class="navbar-brand mb-4">Solução de Problema</h5>
+        <a href="/" class="btn btn-outline-light"> + Soluções</a>
 
     </nav>
     <div class="container">
