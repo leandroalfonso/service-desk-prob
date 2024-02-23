@@ -13,6 +13,10 @@
         body {
             background-color: #ececec;
         }
+         .id-text {
+            display: flex;
+            justify-content: space-between;
+        }
 
         .navbar {
             background-color: #000;
@@ -91,6 +95,7 @@
                 /* Adiciona margem na parte inferior dos cards pares */
             }
         }
+       
     </style>
 </head>
 
@@ -308,15 +313,21 @@
                     if (response.ok) {
                         console.log(`Post ID: ${id} editado com sucesso`);
 
-                        // Ocultar o modal de edição usando Bootstrap
-                        const editarModal = new bootstrap.Modal(document.getElementById('editarModal'));
-                        editarModal.hide();
+                     
 
                         // Atualizar os cards após edição
                         buscar();
 
                         // Exibir mensagem de sucesso
                         alert("Alterações salvas com sucesso!");
+
+                         const editarModal = new bootstrap.Modal(document.getElementById('editarModal'));
+                        editarModal.hide();
+
+                        
+
+
+
                     } else {
                         console.error('Erro ao salvar edição:', response.statusText);
                     }
