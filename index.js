@@ -25,7 +25,7 @@ app.get ('/lista', (req, res) => {
 
 app.get ('/detalhes/:id', (req, res) => {
   const id = parseInt (req.params.id);
-  fs.readFile ('dados.json', 'utf8', (err, data) => {
+  fs.readFile ('https://idyllic-dolphin-d890b0.netlify.app/dados.json', 'utf8', (err, data) => {
     if (err) {
       console.error ('Erro ao ler o arquivo JSON:', err);
       res.status (500).json ({error: 'Erro interno do servidor'});
@@ -49,7 +49,7 @@ app.get ('/detalhes/:id', (req, res) => {
 
 app.get ('/buscar/:termo', (req, res) => {
   const termo = req.params.termo.toLowerCase ();
-  fs.readFile ('dados.json', 'utf8', (err, data) => {
+  fs.readFile ('/https://idyllic-dolphin-d890b0.netlify.app/dados.json', 'utf8', (err, data) => {
     if (err) {
       console.error ('Erro ao ler o arquivo JSON:', err);
       res.status (500).json ({error: 'Erro interno do servidor'});
@@ -73,7 +73,7 @@ app.get ('/buscar/:termo', (req, res) => {
 });
 
 
-app.get ('/dados-json', (req, res) => {
+app.get ('https://idyllic-dolphin-d890b0.netlify.app/dados.json', (req, res) => {
   fs.readFile ('dados.json', 'utf8', (err, data) => {
     if (err) {
       console.error ('Erro ao ler o arquivo JSON:', err);
@@ -110,7 +110,7 @@ app.put ('/editar/:id', (req, res) => {
         // Atualiza o conteúdo do post
         jsonData[index].conteudo = novoConteudo;
         // Escreve de volta no arquivo
-        fs.writeFile ('dados.json', JSON.stringify (jsonData), err => {
+        fs.writeFile ('https://idyllic-dolphin-d890b0.netlify.app/dados.json', JSON.stringify (jsonData), err => {
           if (err) {
             console.error ('Erro ao escrever no arquivo JSON:', err);
             res.status (500).send ('Erro interno do servidor');
@@ -133,7 +133,7 @@ app.put ('/editar/:id', (req, res) => {
 app.post ('/insere-json', (req, res) => {
   const dados = req.body;
 
-  const filePath = __dirname + '/dados.json';
+  const filePath = __dirname + 'https://idyllic-dolphin-d890b0.netlify.app/dados.json';
 
   fs.readFile (filePath, 'utf8', (err, data) => {
     if (err) {
