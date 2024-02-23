@@ -1,18 +1,31 @@
 const express = require ('express');
+const mysql = require ('mysql');
 const app = express ();
 const PORT = process.env.PORT || 3000;
 const cors = require ('cors');
-const axios = require ('axios');
 
 app.use (express.json ());
 app.use (cors ());
 
-app.get ('/', (req, res) => {
-  res.sendFile (__dirname + '/index.html');
+// Configuração da conexão com o banco de dados MySQL
+const connection = mysql.createConnection ({
+  host: 'lanchonete-bd.mysql.uhserver.com',
+  user: 'leandroafonso',
+  password: 'Leandro171716@',
+  database: 'lanchonete_bd',
 });
 
-app.get ('/detalhes', (req, res) => {
-  res.sendFile (__dirname + '/detalhes.html');
+// Conecta-se ao banco de dados
+connection.connect (err => {
+  if (err) {
+    console.error ('Erro ao conectar ao banco de dados:', err);
+    return;
+  }
+  console.log ('Conexão bem-sucedida com o banco de dados MySQL');
+});
+
+app.get ('/', (req, res) => {
+  res.sendFile (__dirname + '/index.html');
 });
 
 app.get ('/lista', (req, res) => {
@@ -20,91 +33,80 @@ app.get ('/lista', (req, res) => {
 });
 
 // Rota para buscar detalhes de um item pelo ID
-app.get ('/detalhes/:id', async (req, res) => {
+app.get ('/detalhes/:id', (req, res) => {
   const id = parseInt (req.params.id);
-  try {
-    const response = await axios.get (
-      'https://service-desk-prob.vercel.app/dados.json'
-    );
-    const jsonData = response.data;
-    const detalhes = jsonData.find (item => item.id === id);
-    if (detalhes) {
-      res.json (detalhes);
+  // Consulta SQL para selecionar o item com o ID especificado
+  const sql = 'SELECT * FROM problemas WHERE id_problema = ?';
+  connection.query (sql, [id], (err, results) => {
+    if (err) {
+      console.error ('Erro ao buscar detalhes:', err);
+      res.status (500).json ({error: 'Erro interno do servidor'});
+      return;
+    }
+    if (results.length > 0) {
+      res.json (results[0]);
     } else {
       res.status (404).json ({error: 'Item não encontrado'});
     }
-  } catch (error) {
-    console.error ('Erro ao buscar dados:', error);
-    res.status (500).json ({error: 'Erro interno do servidor'});
-  }
+  });
 });
 
 // Rota para buscar dados com base em um termo de pesquisa
-app.get ('/buscar', async (req, res) => {
-  const termo = req.query.searchTerm.toLowerCase ();
-  try {
-    const response = await axios.get (
-      'https://service-desk-prob.vercel.app/dados.json'
-    );
-    const jsonData = response.data;
-    const resultados = jsonData.filter (item => {
-      return (
-        item.titulo.toLowerCase ().includes (termo) ||
-        item.conteudo.toLowerCase ().includes (termo) ||
-        item.id.toString ().includes (termo)
-      );
-    });
-    res.json (resultados);
-  } catch (error) {
-    console.error ('Erro ao buscar dados:', error);
-    res.status (500).json ({error: 'Erro interno do servidor'});
-  }
+app.get ('/buscar', (req, res) => {
+  const termo = req.query.searchTerm ? req.query.searchTerm.toLowerCase () : '';
+
+  // Consulta SQL para selecionar itens que correspondam ao termo de pesquisa
+  const sql =
+    'SELECT * FROM problemas WHERE LOWER(titulo_problema) LIKE ? OR LOWER(post) LIKE ?';
+  const searchTerm = `%${termo}%`;
+  connection.query (sql, [searchTerm, searchTerm], (err, results) => {
+    if (err) {
+      console.error ('Erro ao buscar dados:', err);
+      res.status (500).json ({error: 'Erro interno do servidor'});
+      return;
+    }
+    res.json (results);
+  });
 });
 
 // Rota para editar o conteúdo de um post pelo ID
-app.put ('/api/editar/:id', async (req, res) => {
+app.put ('/editar/:id', (req, res) => {
   const id = parseInt (req.params.id);
   const novoConteudo = req.body.conteudo;
-  try {
-    const response = await axios.get (
-      'https://service-desk-prob.vercel.app/dados.json'
-    );
-    let jsonData = response.data;
-    const index = jsonData.findIndex (item => item.id === id);
-    if (index !== -1) {
-      // Atualiza o conteúdo do post
-      jsonData[index].conteudo = novoConteudo;
-      // Envia a requisição PUT para atualizar os dados
-      await axios.put (
-        `https://service-desk-prob.vercel.app/editar/${id}`,
-        {conteudo: novoConteudo}
-      );
+  // Consulta SQL para atualizar o conteúdo do post com o ID especificado
+  const sql = 'UPDATE problemas SET post = ? WHERE id_problema = ?';
+  connection.query (sql, [novoConteudo, id], (err, results) => {
+    if (err) {
+      console.error ('Erro ao editar post:', err);
+      res.status (500).send ('Erro interno do servidor');
+      return;
+    }
+    if (results.affectedRows > 0) {
       console.log (`Post ID: ${id} editado com sucesso`);
       res.send ('Edição do post realizada com sucesso');
     } else {
       res.status (404).send ('Post não encontrado');
     }
-  } catch (error) {
-    console.error ('Erro ao editar post:', error);
-    res.status (500).send ('Erro interno do servidor');
-  }
+  });
 });
 
-app.post ('/insere-json', async (req, res) => {
+// Rota para inserir dados no banco de dados
+app.post ('/insere-json', (req, res) => {
   const dados = req.body;
-  try {
-    const response = await axios.post (
-      'https://service-desk-prob.vercel.app/insere-json',
-      dados
-    );
+  // Consulta SQL para inserir os dados na tabela
+  const sql =
+    'INSERT INTO problemas (titulo_problema, post, link, autor) VALUES (?, ?, ?, ?)';
+  const values = [dados.titulo, dados.conteudo, dados.link, dados.autor];
+  connection.query (sql, values, (err, results) => {
+    if (err) {
+      console.error ('Erro ao inserir dados:', err);
+      res.status (500).send ('Erro interno do servidor');
+      return;
+    }
     console.log ('Dados inseridos com sucesso:', dados);
     res.send ('Dados inseridos com sucesso');
-  } catch (error) {
-    console.error ('Erro ao inserir dados:', error);
-    res.status (500).send ('Erro interno do servidor');
-  }
+  });
 });
-
 
 app.listen (PORT, () => {
   console.log (`Server is running on port ${PORT}`);

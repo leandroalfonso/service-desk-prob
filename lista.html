@@ -208,9 +208,9 @@
                 <div class="col-md-4">
                     <div class="card">
                         <div class="card-body">
-                            <h5 class="card-title">${resultado.titulo}</h5>
-                            <p class="card-text">${formatarTexto(resultado.conteudo)}</p>
-                            <p class="card-text">ID: ${resultado.id}</p>
+                            <h5 class="card-title">${resultado.titulo_problema}</h5>
+                            <p class="card-text">${formatarTexto(resultado.post)}</p>
+                            <p class="card-text">ID: ${resultado.id_problema}</p>
                             <p class="card-text">Link Relacionado na Base: <a href="${resultado.link}" target="_blank">${resultado.link}</a></p>
 
                             <div>
@@ -223,8 +223,8 @@
 
                                 <!-- Adicionando o novo botão "Detalhes" -->
                                 <div class="botoes">
-                                    <button class="btn btn-primary" onclick="abrirDetalhesModal(${resultado.id})">Detalhes</button>
-                                    <button class="btn btn-secondary" onclick="editarPost(${resultado.id})">Editar</button>
+                                    <button class="btn btn-primary" onclick="abrirDetalhesModal(${resultado.id_problema})">Detalhes</button>
+                                    <button class="btn btn-secondary" onclick="editarPost(${resultado.id_problema})">Editar</button>
                                 </div>
                             </div>
                         </div>
@@ -238,6 +238,24 @@
             }
         }
 
+    // Função para formatar texto
+    function formatarTexto(texto) {
+        // Verifica se o texto é indefinido ou nulo
+        if (texto && typeof texto === 'string') {
+            // Divide o texto em frases
+            const frases = texto.split('. ');
+            // Inicializa o texto formatado
+            let textoFormatado = '';
+            // Itera sobre as frases
+            frases.forEach(frase => {
+                // Adiciona a frase ao texto formatado com ponto final
+                textoFormatado += `${frase.trim()}. `;
+            });
+            return textoFormatado;
+        } else {
+            return ''; // Retorna uma string vazia se o texto for indefinido ou não for uma string
+        }
+    }
 
 
         // Função para abrir o modal com os detalhes do item
@@ -249,11 +267,11 @@
                 // Atualizar o conteúdo do modal com os detalhes do item
                 const modalBody = document.getElementById('modalBody');
                 const detalhesModalLabel = document.getElementById('detalhesModalLabel');
-                detalhesModalLabel.innerText = ` ${detalhes.titulo}`;
+                detalhesModalLabel.innerText = ` ${detalhes.titulo_problema}`;
                 modalBody.innerHTML = `
 
-            <h5 class="card-title">${detalhes.conteudo}</h5>
-            <p class="card-text">ID:${detalhes.id}</p>
+            <h5 class="card-title">${detalhes.post}</h5>
+            <p class="card-text">ID:${detalhes.id_problema}</p>
         `;
 
                 // Abrir o modal
@@ -273,7 +291,7 @@
 
                 const response = await fetch(`/detalhes/${id}`);
                 const detalhes = await response.json();
-                postContent.value = detalhes.conteudo;
+                postContent.value = detalhes.post;
 
                 // Remover o atributo 'readonly' para permitir edição
                 postContent.removeAttribute('readonly');
@@ -339,22 +357,7 @@
             }
         });
 
-        // Função para formatar texto
-        function formatarTexto(texto) {
-            // Divide o texto em frases
-            const frases = texto.split('. ');
-
-            // Inicializa o texto formatado
-            let textoFormatado = '';
-
-            // Itera sobre as frases
-            frases.forEach(frase => {
-                // Adiciona a frase ao texto formatado com ponto final
-                textoFormatado += `${frase.trim()}. `;
-            });
-
-            return textoFormatado;
-        }
+     
     </script>
 </body>
 
