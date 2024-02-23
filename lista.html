@@ -187,11 +187,11 @@
         async function buscar() {
             try {
                 const searchTerm = document.getElementById('searchInput').value.trim();
-                let url = 'https://idyllic-dolphin-d890b0.netlify.app/dados-json'; // Define a URL padrão como /dados-json
+                let url = '/dados-json'; // Define a URL padrão como /dados-json
 
                 // Se o campo de pesquisa não estiver vazio, atualiza a URL para buscar com o termo
                 if (searchTerm !== '') {
-                    url = `https://idyllic-dolphin-d890b0.netlify.app/buscar/${encodeURIComponent(searchTerm)}`;
+                    url = `/buscar/${encodeURIComponent(searchTerm)}`;
                 }
 
                 const response = await fetch(url);
@@ -243,7 +243,7 @@
         // Função para abrir o modal com os detalhes do item
         async function abrirDetalhesModal(id) {
             try {
-                const response = await fetch(`https://idyllic-dolphin-d890b0.netlify.app/detalhes/${id}`);
+                const response = await fetch(`/detalhes/${id}`);
                 const detalhes = await response.json();
 
                 // Atualizar o conteúdo do modal com os detalhes do item
@@ -271,7 +271,7 @@
                 const postContent = document.getElementById('postContent');
                 postContent.dataset.postId = id; // Armazena o ID do post no dataset do textarea
 
-                const response = await fetch(`https://idyllic-dolphin-d890b0.netlify.app/detalhes/${id}`);
+                const response = await fetch(`/detalhes/${id}`);
                 const detalhes = await response.json();
                 postContent.value = detalhes.conteudo;
 
@@ -296,7 +296,7 @@
 
             if (confirmacao) {
                 // Enviar requisição para salvar a edição do post
-                const response = await fetch(`https://idyllic-dolphin-d890b0.netlify.app/editar/${id}`, {
+                const response = await fetch(`/editar/${id}`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json'
