@@ -19,6 +19,7 @@ app.get ('/lista', (req, res) => {
   res.sendFile (__dirname + '/lista.html');
 });
 
+// Rota para buscar detalhes de um item pelo ID
 app.get ('/detalhes/:id', async (req, res) => {
   const id = parseInt (req.params.id);
   try {
@@ -38,8 +39,9 @@ app.get ('/detalhes/:id', async (req, res) => {
   }
 });
 
-app.get ('/buscar/:termo', async (req, res) => {
-  const termo = req.params.termo.toLowerCase ();
+// Rota para buscar dados com base em um termo de pesquisa
+app.get ('/buscar', async (req, res) => {
+  const termo = req.query.searchTerm.toLowerCase ();
   try {
     const response = await axios.get (
       'https://idyllic-dolphin-d890b0.netlify.app/dados.json'
@@ -59,7 +61,8 @@ app.get ('/buscar/:termo', async (req, res) => {
   }
 });
 
-app.put ('/editar/:id', async (req, res) => {
+// Rota para editar o conteúdo de um post pelo ID
+app.put ('/api/editar/:id', async (req, res) => {
   const id = parseInt (req.params.id);
   const novoConteudo = req.body.conteudo;
   try {
@@ -90,13 +93,7 @@ app.put ('/editar/:id', async (req, res) => {
 app.post ('/insere-json', async (req, res) => {
   const dados = req.body;
   try {
-    const response = await axios.get (
-      'https://idyllic-dolphin-d890b0.netlify.app/dados.json'
-    );
-    let jsonContent = response.data;
-    jsonContent.push (dados);
-    // Envia a requisição POST para inserir os dados
-    await axios.post (
+    const response = await axios.post (
       'https://idyllic-dolphin-d890b0.netlify.app/insere-json',
       dados
     );
@@ -107,6 +104,7 @@ app.post ('/insere-json', async (req, res) => {
     res.status (500).send ('Erro interno do servidor');
   }
 });
+
 
 app.listen (PORT, () => {
   console.log (`Server is running on port ${PORT}`);

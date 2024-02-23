@@ -184,14 +184,14 @@
 
 
     <script>
-        async function buscar() {
+       async function buscar() {
             try {
                 const searchTerm = document.getElementById('searchInput').value.trim();
-                let url = 'https://idyllic-dolphin-d890b0.netlify.app/dados-json'; // Define a URL padrão como /dados-json
+                let url = 'https://idyllic-dolphin-d890b0.netlify.app/buscar'; // Rota no backend para buscar dados
 
                 // Se o campo de pesquisa não estiver vazio, atualiza a URL para buscar com o termo
                 if (searchTerm !== '') {
-                    url = `/buscar/${encodeURIComponent(searchTerm)}`;
+                    url += `?searchTerm=${encodeURIComponent(searchTerm)}`;
                 }
 
                 const response = await fetch(url);
@@ -222,11 +222,10 @@
                                 </div>
 
                                 <!-- Adicionando o novo botão "Detalhes" -->
-                                    <div class="botoes">
-                                        <button class="btn btn-primary" onclick="abrirDetalhesModal(${resultado.id})">Detalhes</button>
-                                         <button class="btn btn-secondary" onclick="editarPost(${resultado.id})">Editar</button>
-                                    </div>
-                               
+                                <div class="botoes">
+                                    <button class="btn btn-primary" onclick="abrirDetalhesModal(${resultado.id})">Detalhes</button>
+                                    <button class="btn btn-secondary" onclick="editarPost(${resultado.id})">Editar</button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -238,6 +237,7 @@
                 console.error('Erro ao buscar dados:', error);
             }
         }
+
 
 
         // Função para abrir o modal com os detalhes do item
