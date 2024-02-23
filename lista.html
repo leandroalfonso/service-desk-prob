@@ -13,22 +13,27 @@
         body {
             background-color: #ececec;
         }
-         .id-text {
+
+        .id-text {
             display: flex;
             justify-content: space-between;
         }
 
-       .navbar {
+        .navbar {
             background-color: #8c30b1;
             color: #fff;
             height: 60px;
             width: 100%;
             text-align: center;
-          
-           
+
+
         }
+        .input-group {
+            margin-top: 20px;
+        }
+
         .navbar h5 {
-          
+
             margin-left: 10px;
         }
 
@@ -105,15 +110,14 @@
                 /* Adiciona margem na parte inferior dos cards pares */
             }
         }
-       
     </style>
 </head>
 
 <body>
     <nav class="navbar navbar-dark">
-       
-            <h5 class="navbar-brand mb-4">Relatos de Solução de Problema</h5>
-     
+
+        <h5 class="navbar-brand mb-4">Relatos de Solução de Problema</h5>
+
     </nav>
     <div class="container">
         <div class="mb-4">
@@ -155,6 +159,9 @@
                     <!-- Remova o atributo 'readonly' do textarea -->
                     <label for="postContent" class="form-label">Conteúdo:</label>
                     <textarea class="form-control" id="postContent" style="width:100%; height: 400px;"></textarea>
+                    <div class="input-group">
+                        <input type="text" id="autor-edicao" class="form-control" placeholder="Autor da edição">
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
@@ -302,52 +309,49 @@
             }
         }
 
-        async function salvarEdicao() {
-            try {
-                const id = document.getElementById('postContent').dataset.postId; // Obtém o ID do post
-                const novoConteudo = document.getElementById('postContent').value;
+ async function salvarEdicao() {
+        try {
+            const id = document.getElementById('postContent').dataset.postId; // Obtém o ID do post
+            const novoConteudo = document.getElementById('postContent').value;
+            const autorEdicao = document.getElementById('autor-edicao').value;
 
-                // Exibir uma janela de confirmação
-                const confirmacao = confirm("Você deseja salvar as alterações?");
+            // Exibir uma janela de confirmação
+            const confirmacao = confirm("Você deseja salvar as alterações?");
 
-                if (confirmacao) {
-                    // Enviar requisição para salvar a edição do post
-                    const response = await fetch(`/editar/${id}`, {
-                        method: 'PUT',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({ conteudo: novoConteudo })
-                    });
+            if (confirmacao) {
+                // Enviar requisição para salvar a edição do post
+                const response = await fetch(`/editar/${id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ conteudo: novoConteudo, autor: autorEdicao })
+                });
 
-                    if (response.ok) {
-                        console.log(`Post ID: ${id} editado com sucesso`);
+                if (response.ok) {
+                    console.log(`Post ID: ${id} editado com sucesso`);
 
-                     
+                    // Limpar o campo autor após salvar a edição
+                    document.getElementById('autor-edicao').value = '';
 
-                        // Atualizar os cards após edição
-                        buscar();
+                    // Atualizar os cards após edição
+                    buscar();
 
-                        // Exibir mensagem de sucesso
-                        alert("Alterações salvas com sucesso!");
+                    // Exibir mensagem de sucesso
+                    alert("Alterações salvas com sucesso!");
 
-                         const editarModal = new bootstrap.Modal(document.getElementById('editarModal'));
-                        editarModal.hide();
-
-                        
-
-
-
-                    } else {
-                        console.error('Erro ao salvar edição:', response.statusText);
-                    }
+                    const editarModal = new bootstrap.Modal(document.getElementById('editarModal'));
+                    editarModal.hide();
                 } else {
-                    console.log("Edição cancelada");
+                    console.error('Erro ao salvar edição:', response.statusText);
                 }
-            } catch (error) {
-                console.error('Erro ao salvar edição:', error);
+            } else {
+                console.log("Edição cancelada");
             }
+        } catch (error) {
+            console.error('Erro ao salvar edição:', error);
         }
+    }
 
         // Chamar a função para carregar os cards quando a página carregar
         window.onload = buscar;

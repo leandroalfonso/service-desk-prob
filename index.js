@@ -73,9 +73,12 @@ app.get ('/buscar', (req, res) => {
 app.put ('/editar/:id', (req, res) => {
   const id = parseInt (req.params.id);
   const novoConteudo = req.body.conteudo;
+  const novoAutor = req.body.autor; // Corrigido para novoAutor
+
   // Consulta SQL para atualizar o conteúdo do post com o ID especificado
-  const sql = 'UPDATE problemas SET post = ? WHERE id_problema = ?';
-  connection.query (sql, [novoConteudo, id], (err, results) => {
+  const sql = 'UPDATE problemas SET post = ?, autor = ?, data_publicacao = NOW() WHERE id_problema = ?'; // Atualizado para incluir o novo autor
+  connection.query (sql, [novoConteudo, novoAutor, id], (err, results) => {
+    // Corrigido para incluir novoAutor
     if (err) {
       console.error ('Erro ao editar post:', err);
       res.status (500).send ('Erro interno do servidor');
@@ -95,7 +98,7 @@ app.post ('/insere-json', (req, res) => {
   const dados = req.body;
   // Consulta SQL para inserir os dados na tabela
   const sql =
-    'INSERT INTO problemas (titulo_problema, post, link, autor,data_publicacao) VALUES (?, ?, ?, ?,NOW())';
+    'INSERT INTO problemas (titulo_problema, post, link, autor, data_publicacao) VALUES (?, ?, ?, ?, NOW())';
   const values = [dados.titulo, dados.conteudo, dados.link, dados.autor];
   connection.query (sql, values, (err, results) => {
     if (err) {
