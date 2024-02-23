@@ -95,7 +95,7 @@ app.post ('/insere-json', (req, res) => {
   const dados = req.body;
   // Consulta SQL para inserir os dados na tabela
   const sql =
-    'INSERT INTO problemas (titulo_problema, post, link, autor) VALUES (?, ?, ?, ?)';
+    'INSERT INTO problemas (titulo_problema, post, link, autor,data_publicacao) VALUES (?, ?, ?, ?,NOW())';
   const values = [dados.titulo, dados.conteudo, dados.link, dados.autor];
   connection.query (sql, values, (err, results) => {
     if (err) {
