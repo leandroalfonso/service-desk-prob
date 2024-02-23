@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visualizar Dados</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            max-width: 100%;
+            height: auto;
+            background-color: #ececec;
+        }
+
+        .container {
+            width: 100%;
+            height: auto;
+            margin: auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            /* Centraliza o conteúdo verticalmente */
+        }
+
+        .form-control {
+            /* Desconta o espaço do ícone */
+            height: 60px;
+            border-radius: 12px;
+            padding-right: 40px;
+            /* Espaço para o ícone */
+        }
+
+        .search-icon {
+            position: absolute;
+            top: 50%;
+            right: 10px;
+            transform: translateY(-50%);
+            width: 20px;
+            height: 20px;
+            fill: #777;
+            cursor: pointer;
+            /* Adiciona cursor ao ícone */
+        }
+
+        .card {
+            margin-bottom: 20px;
+            background-color: #ffffff;
+            color: #525151;
+            width: 100%;
+            height: auto;
+            border-radius: 12px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+          
+          
+        }
+
+        .col-md-4 {
+            width: 100%;
+            height: auto;
+        }
+
+        .card-body {
+            min-height: 100px;
+        }
+
+        .mb-4 {
+            color: #292929;
+            margin-top: 30px;
+        }
+
+        .mb-12 {
+            color: #292929;
+
+            width: 100%;
+            margin-top: 30px;
+        }
+
+        .navbar {
+            width: 100%;
+            height: 60px;
+            background-color: #000;
+        }
+
+        .search-icon {
+            fill: #ffffff;
+            width: 40px;
+            height: 40px;
+            background-color: blueviolet;
+            z-index: 1;
+            border-radius: 12px;
+            padding: 5px;
+        }
+
+        .modal-header {
+            background-color: #b9b6b6;
+            color: #fff;
+        }
+
+        .modal-content {
+            background-color: #292929;
+            color: #fff;
+            z-index: 9999;
+            /* Adicione esta linha para definir o z-index */
+        }
+        .botoes {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="navbar">
+        <p class="mb-4">Relatos de Solução de Problema</p>
+    </div>
+    <div class="container">
+        <div class="mb-12">
+            <div class="input-group">
+                <input type="text" class="form-control" id="searchInput" placeholder="Pesquisar...">
+                <svg class="search-icon" viewBox="0 0 24 24" onclick="buscar()">
+                    <path fill="none" d="M0 0h24v24H0z" />
+                    <path
+                        d="M15.5 14h-.79l-.28-.27a6.5 6.5 0 0 0 1.48-5.34c-.47-2.78-2.89-5-5.69-5.34a6.505 6.505 0 0 0-7.27 7.27c.34 2.8 2.56 5.22 5.34 5.69a6.5 6.5 0 0 0 5.34-1.48l.27.28v.79l4.25 4.25c.41.41 1.08.41 1.49 0 .41-.41.41-1.08 0-1.49L15.5 14zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" />
+                </svg>
+            </div>
+            <hr>
+        </div>
+
+        <h1 class="mb-4">Dados das Soluções</h1>
+        <div class="row" id="cardsContainer">
+            <!-- Cards serão inseridos aqui -->
+        </div>
+    </div>
+
+<!-- Modal para exibir detalhes -->
+<div class="modal fade" id="detalhesModal" tabindex="-1" aria-labelledby="detalhesModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="detalhesModalLabel">Detalhes do Item</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- Detalhes do item serão inseridos aqui -->
+            </div>
+        </div>
+    </div>
+</div>
+
+    <div id="editarModal" class="modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Editar Post</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Remova o atributo 'readonly' do textarea -->
+                    <label for="postContent" class="form-label>">Conteúdo:</label>
+                <textarea class="form-control" id="postContent" style="width:100%; height: 400px;"></textarea>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" onclick="salvarEdicao()">Salvar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Scripts necessários para o Bootstrap -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+
+
+    <script>
+        async function buscar() {
+            try {
+                const searchTerm = document.getElementById('searchInput').value.trim();
+                let url = '/dados-json'; // Define a URL padrão como /dados-json
+
+                // Se o campo de pesquisa não estiver vazio, atualiza a URL para buscar com o termo
+                if (searchTerm !== '') {
+                    url = `/buscar/${encodeURIComponent(searchTerm)}`;
+                }
+
+                const response = await fetch(url);
+                const resultados = await response.json();
+
+                const cardsContainer = document.getElementById('cardsContainer');
+
+                // Limpar cards antigos
+                cardsContainer.innerHTML = '';
+
+                // Adicionar novos cards com os resultados da busca
+                resultados.forEach(resultado => {
+                    const card = `
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">${resultado.titulo}</h5>
+                            <p class="card-text">${formatarTexto(resultado.conteudo)}</p>
+                            <p class="card-text">ID: ${resultado.id}</p>
+                            <p class="card-text">Link Relacionado na Base: <a href="${resultado.link}" target="_blank">${resultado.link}</a></p>
+
+                            <div>
+                                <div>
+                                    <small class="text-muted">Autor: ${resultado.autor}</small>
+                                </div>
+                                <div>
+                                    <small class="text-muted">Data: ${resultado.data}</small>
+                                </div>
+
+                                <!-- Adicionando o novo botão "Detalhes" -->
+                                    <div class="botoes">
+                                        <button class="btn btn-primary" onclick="abrirDetalhesModal(${resultado.id})">Detalhes</button>
+                                         <button class="btn btn-secondary" onclick="editarPost(${resultado.id})">Editar</button>
+                                    </div>
+                               
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+                    cardsContainer.innerHTML += card;
+                });
+            } catch (error) {
+                console.error('Erro ao buscar dados:', error);
+            }
+        }
+
+
+        // Função para abrir o modal com os detalhes do item
+        async function abrirDetalhesModal(id) {
+            try {
+                const response = await fetch(`/detalhes/${id}`);
+                const detalhes = await response.json();
+
+                // Atualizar o conteúdo do modal com os detalhes do item
+                const modalBody = document.getElementById('modalBody');
+                const detalhesModalLabel = document.getElementById('detalhesModalLabel');
+                detalhesModalLabel.innerText = ` ${detalhes.titulo}`;
+                modalBody.innerHTML = `
+
+            <h5 class="card-title">${detalhes.conteudo}</h5>
+            <p class="card-text">ID:${detalhes.id}</p>
+        `;
+
+                // Abrir o modal
+                var myModal = new bootstrap.Modal(document.getElementById('detalhesModal'));
+                myModal.show();
+            } catch (error) {
+                console.error('Erro ao carregar detalhes:', error);
+            }
+        }
+
+
+        async function editarPost(id) {
+            try {
+                // Atualizar o conteúdo do modal de edição com o conteúdo atual do post
+                const postContent = document.getElementById('postContent');
+                postContent.dataset.postId = id; // Armazena o ID do post no dataset do textarea
+
+                const response = await fetch(`/detalhes/${id}`);
+                const detalhes = await response.json();
+                postContent.value = detalhes.conteudo;
+
+                // Remover o atributo 'readonly' para permitir edição
+                postContent.removeAttribute('readonly');
+
+                // Abrir apenas o modal de edição e não o de detalhes
+                const editarModal = new bootstrap.Modal(document.getElementById('editarModal'));
+                editarModal.show();
+            } catch (error) {
+                console.error('Erro ao carregar detalhes:', error);
+            }
+        }
+
+   async function salvarEdicao() {
+        try {
+            const id = document.getElementById('postContent').dataset.postId; // Obtém o ID do post
+            const novoConteudo = document.getElementById('postContent').value;
+
+            // Exibir uma janela de confirmação
+            const confirmacao = confirm("Você deseja salvar as alterações?");
+
+            if (confirmacao) {
+                // Enviar requisição para salvar a edição do post
+                const response = await fetch(`/editar/${id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ conteudo: novoConteudo })
+                });
+
+                if (response.ok) {
+                    console.log(`Post ID: ${id} editado com sucesso`);
+
+                    // Ocultar o modal de edição usando Bootstrap
+                    const editarModal = new bootstrap.Modal(document.getElementById('editarModal'));
+                    editarModal.hide();
+
+                    // Atualizar os cards após edição
+                    buscar();
+
+                    // Exibir mensagem de sucesso
+                    alert("Alterações salvas com sucesso!");
+                } else {
+                    console.error('Erro ao salvar edição:', response.statusText);
+                }
+            } else {
+                console.log("Edição cancelada");
+            }
+        } catch (error) {
+            console.error('Erro ao salvar edição:', error);
+        }
+    }
+
+
+
+        // Chamar a função para carregar os cards quando a página carregar
+        window.onload = buscar;
+
+        // Ouvinte de evento para capturar a tecla "Enter" pressionada no campo de entrada de texto
+        document.getElementById('searchInput').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                buscar(); // Chama a função de busca quando a tecla "Enter" for pressionada
+            }
+        });
+
+        // Função para formatar texto
+        function formatarTexto(texto) {
+            // Divide o texto em frases
+            const frases = texto.split('. ');
+
+            // Inicializa o texto formatado
+            let textoFormatado = '';
+
+            // Itera sobre as frases
+            frases.forEach(frase => {
+                // Adiciona a frase ao texto formatado com ponto final
+                textoFormatado += `${frase.trim()}. `;
+            });
+
+            return textoFormatado;
+        }
+    </script>
+</body>
+
+</html>
