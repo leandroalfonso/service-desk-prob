@@ -24,7 +24,7 @@ app.get ('/detalhes/:id', async (req, res) => {
   const id = parseInt (req.params.id);
   try {
     const response = await axios.get (
-      'https://idyllic-dolphin-d890b0.netlify.app/dados.json'
+      'https://service-desk-prob.vercel.app/lista/dados.json'
     );
     const jsonData = response.data;
     const detalhes = jsonData.find (item => item.id === id);
@@ -44,7 +44,7 @@ app.get ('/buscar', async (req, res) => {
   const termo = req.query.searchTerm.toLowerCase ();
   try {
     const response = await axios.get (
-      'https://idyllic-dolphin-d890b0.netlify.app/dados.json'
+      'https://service-desk-prob.vercel.app/lista/dados.json'
     );
     const jsonData = response.data;
     const resultados = jsonData.filter (item => {
@@ -67,7 +67,7 @@ app.put ('/api/editar/:id', async (req, res) => {
   const novoConteudo = req.body.conteudo;
   try {
     const response = await axios.get (
-      'https://idyllic-dolphin-d890b0.netlify.app/dados.json'
+      'https://service-desk-prob.vercel.app/lista/dados.json'
     );
     let jsonData = response.data;
     const index = jsonData.findIndex (item => item.id === id);
@@ -76,7 +76,7 @@ app.put ('/api/editar/:id', async (req, res) => {
       jsonData[index].conteudo = novoConteudo;
       // Envia a requisição PUT para atualizar os dados
       await axios.put (
-        `https://idyllic-dolphin-d890b0.netlify.app/editar/${id}`,
+        `https://service-desk-prob.vercel.app/lista/editar/${id}`,
         {conteudo: novoConteudo}
       );
       console.log (`Post ID: ${id} editado com sucesso`);
@@ -94,7 +94,7 @@ app.post ('/insere-json', async (req, res) => {
   const dados = req.body;
   try {
     const response = await axios.post (
-      'https://idyllic-dolphin-d890b0.netlify.app/insere-json',
+      'https://service-desk-prob.vercel.app/lista/insere-json',
       dados
     );
     console.log ('Dados inseridos com sucesso:', dados);
