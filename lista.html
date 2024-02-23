@@ -187,7 +187,7 @@
        async function buscar() {
             try {
                 const searchTerm = document.getElementById('searchInput').value.trim();
-                let url = 'https://idyllic-dolphin-d890b0.netlify.app/buscar'; // Rota no backend para buscar dados
+                let url = '/buscar'; // Rota no backend para buscar dados
 
                 // Se o campo de pesquisa não estiver vazio, atualiza a URL para buscar com o termo
                 if (searchTerm !== '') {
