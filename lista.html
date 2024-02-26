@@ -19,15 +19,15 @@
             justify-content: space-between;
         }
 
-       .navbar {
-        background-color: #8c30b1;
-        color: #fff;
-        height: 60px;
-        width: 100%;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-}
+        .navbar {
+            background-color: #8c30b1;
+            color: #fff;
+            height: 60px;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
 
         .input-group {
             margin-top: 20px;
@@ -37,6 +37,7 @@
 
             margin-left: 10px;
         }
+
         .navbar a {
             margin-right: 10px;
             margin-bottom: 10px;
@@ -96,23 +97,23 @@
             border-top: 1px solid rgba(0, 0, 0, 0.1);
         }
 
-        /* Estilo para mostrar os cards em pares */
+
         @media (min-width: 768px) {
             .card:nth-child(even) {
                 margin-top: 20px;
-                /* Adiciona margem no topo dos cards pares */
+
             }
         }
 
         @media (min-width: 992px) {
             .card:nth-child(odd) {
                 margin-right: 20px;
-                /* Adiciona margem na direita dos cards ímpares */
+
             }
 
             .card:nth-child(even) {
                 margin-bottom: 20px;
-                /* Adiciona margem na parte inferior dos cards pares */
+
             }
         }
     </style>
@@ -131,15 +132,26 @@
                 <input type="text" class="form-control" id="searchInput" placeholder="Pesquisar...">
                 <button class="btn btn-primary" type="button" onclick="buscar()">Buscar</button>
             </div>
+            <div>
+                <small id="mensagem" class="form-text text-muted">Digite o termo de busca e clique em "Buscar" para
+                    visualizar os resultados.</small>
+                <select id="opcao-busca" class="form-select" aria-label="Default select example">
+                    <option selected>Ordenar por...</option>
+                    <option value="0" selected>Todos</option>
+                    <option value="1">Requisição</option>
+                    <option value="2">Incidente</option>
+                </select>
+            </div>
         </div>
 
         <h1 class="mb-4">Dados das Soluções</h1>
+        <p id="quantidade"></p>
         <div class="row" id="cardsContainer">
             <!-- Cards serão inseridos aqui -->
         </div>
     </div>
 
-    <!-- Modal para exibir detalhes -->
+
     <div class="modal fade" id="detalhesModal" tabindex="-1" aria-labelledby="detalhesModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content">
@@ -148,7 +160,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body" id="modalBody">
-                    <!-- Detalhes do item serão inseridos aqui -->
+
                 </div>
             </div>
         </div>
@@ -162,7 +174,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <!-- Remova o atributo 'readonly' do textarea -->
+
                     <label for="postContent" class="form-label">Conteúdo:</label>
                     <textarea class="form-control" id="postContent" style="width:100%; height: 400px;"></textarea>
                     <div class="input-group">
@@ -177,32 +189,41 @@
         </div>
     </div>
 
-    <!-- Scripts necessários para o Bootstrap -->
+
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
-        async function buscar() {
+      async function buscar() {
             try {
                 const searchTerm = document.getElementById('searchInput').value.trim();
-                let url = '/buscar'; // Rota no backend para buscar dados
+                const opcaoBusca = document.getElementById('opcao-busca').value;
+                let url = '/buscar';
 
-                // Se o campo de pesquisa não estiver vazio, atualiza a URL para buscar com o termo
                 if (searchTerm !== '') {
-                    url += `?searchTerm=${encodeURIComponent(searchTerm)}`;
+                    url += `?searchTerm=${encodeURIComponent(searchTerm)}&opcaoBusca=${encodeURIComponent(opcaoBusca)}`;
+                } else {
+                    url += `?opcaoBusca=${encodeURIComponent(opcaoBusca)}`; // Adiciona apenas a opção de busca
                 }
 
                 const response = await fetch(url);
                 const resultados = await response.json();
 
                 const cardsContainer = document.getElementById('cardsContainer');
+                const quantidade = resultados.length;
 
-                // Limpar cards antigos
+                // Exibir a quantidade de resultados
+                if (quantidade === 0) {
+                    document.getElementById('quantidade').innerHTML = `Nenhum resultado encontrado`;
+                } else {
+                    document.getElementById('quantidade').innerHTML = `Exibindo <b>${quantidade}</b> resultados`;
+                }
+
                 cardsContainer.innerHTML = '';
 
                 function formatarDataHora(date) {
                     const dia = String(date.getDate()).padStart(2, '0');
-                    const mes = String(date.getMonth() + 1).padStart(2, '0'); // Os meses começam do zero
+                    const mes = String(date.getMonth() + 1).padStart(2, '0');
                     const ano = date.getFullYear();
                     const horas = String(date.getHours()).padStart(2, '0');
                     const minutos = String(date.getMinutes()).padStart(2, '0');
@@ -212,64 +233,87 @@
 
                 // Adicionar novos cards com os resultados da busca
                 resultados.forEach(resultado => {
-                    const card = `
-                       <div class="col-md-6 p-2">
-    <div class="card h-100">
-        <div class="card-body d-flex flex-column">
-            <div class="id-text">
-                <h5 class="card-title">${resultado.titulo_problema}</h5>
-                 <p class="card-text">ID: ${resultado.id_problema}</p>
+                    let tipoProblema = '';
+                    let color = '';
+                    if (resultado.opcao === 1) {
+                        tipoProblema = 'Requisição';
+                        color = '#a6ffaa';
+                    } else if (resultado.opcao === 2) {
+                        tipoProblema = 'Incidente';
+                        color = '#fccaca';
+                    } else {
+                        tipoProblema = 'Tipo Desconhecido';
+                    }
 
-               </div>
-            
-            <p class="card-text">${formatarTexto(resultado.post)}</p>
-           
-            <p class="card-text">Link Relacionado na Base: <a href="${resultado.link}" target="_blank">${resultado.link}</a></p>
-            <div class="mt-auto">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <small class="card-text">Autor: ${resultado.autor}</small>
-                    </div>
-                    <div>
-                        <small class="text-muted">Data: ${formatarDataHora(new Date(resultado.data_publicacao))}</small>
-                    </div>
+                const card = `
+    <div class="col-md-12 p-2">
+        <div class="card" style="background-color:${color}">
+            <div class="card-body d-flex flex-column">
+                <div class="id-text">
+                    <h5 class="card-title">${resultado.titulo_problema}</h5>
+                    
+                    <p class="card-text"><i> <strong style="color:#000">${tipoProblema}</strong></i></p>
                 </div>
-                <hr></hr>
-                <div class="mt-3">
-                    <button class="btn btn-primary me-2" onclick="abrirDetalhesModal(${resultado.id_problema})">Detalhes</button>
-                    <button class="btn btn-secondary" onclick="editarPost(${resultado.id_problema})">Editar</button>
+                <p class="card-text">${formatarTexto(resultado.post)}</p> <!-- Aqui aplicamos a formatação -->
+                <p class="card-text">Link Relacionado na Base: <a href="${resultado.link}" target="_blank">${resultado.link}</a></p>
+                <div class="mt-auto">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <small class="card-text">Autor: ${resultado.autor}</small>
+                        </div>
+                        <div>
+                            <small class="text-muted">Data: ${formatarDataHora(new Date(resultado.data_publicacao))}</small>
+                        </div>
+                         <p class="card-text">ID: ${resultado.id_problema}</p>
+                    </div>
+                    <hr></hr>
+                    <div class="mt-3">
+                       
+                        <button class="btn btn-primary me-2" onclick="abrirDetalhesModal(${resultado.id_problema})">Detalhes</button>
+                        <button class="btn btn-secondary" onclick="editarPost(${resultado.id_problema})">Editar</button>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
+`;
 
-                    `;
                     cardsContainer.innerHTML += card;
                 });
+
             } catch (error) {
                 console.error('Erro ao buscar dados:', error);
             }
         }
 
-        // Função para formatar texto
-        function formatarTexto(texto) {
-            // Verifica se o texto é indefinido ou nulo
-            if (texto && typeof texto === 'string') {
-                // Divide o texto em frases
-                const frases = texto.split('. ');
-                // Inicializa o texto formatado
-                let textoFormatado = '';
-                // Itera sobre as frases
-                frases.forEach(frase => {
-                    // Adiciona a frase ao texto formatado com ponto final
-                    textoFormatado += `${frase.trim()}. `;
-                });
-                return textoFormatado;
-            } else {
-                return ''; // Retorna uma string vazia se o texto for indefinido ou não for uma string
-            }
+    function formatarTexto(texto) {
+        if (texto && typeof texto === 'string') {
+            let textoFormatado = '';
+
+            // Expressão regular para identificar a sequência específica de números
+            const regex = /(\d{2}(?:[.-]\d{2}){4,5})/g;
+
+            // Aplicar a formatação para cada correspondência encontrada
+            textoFormatado = texto.replace(regex, '<strong>$1</strong>;');
+
+            return textoFormatado;
+        } else {
+            return '';
         }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
 
         // Função para abrir o modal com os detalhes do item
         async function abrirDetalhesModal(id) {
@@ -296,15 +340,15 @@
 
         async function editarPost(id) {
             try {
-                // Atualizar o conteúdo do modal de edição com o conteúdo atual do post
+
                 const postContent = document.getElementById('postContent');
-                postContent.dataset.postId = id; // Armazena o ID do post no dataset do textarea
+                postContent.dataset.postId = id;
 
                 const response = await fetch(`/detalhes/${id}`);
                 const detalhes = await response.json();
                 postContent.value = detalhes.post;
 
-                // Remover o atributo 'readonly' para permitir edição
+
                 postContent.removeAttribute('readonly');
 
                 // Abrir apenas o modal de edição e não o de detalhes
@@ -315,58 +359,61 @@
             }
         }
 
- async function salvarEdicao() {
-        try {
-            const id = document.getElementById('postContent').dataset.postId; // Obtém o ID do post
-            const novoConteudo = document.getElementById('postContent').value;
-            const autorEdicao = document.getElementById('autor-edicao').value;
+        async function salvarEdicao() {
+            try {
+                const id = document.getElementById('postContent').dataset.postId; // Obtém o ID do post
+                const novoConteudo = document.getElementById('postContent').value;
+                const autorEdicao = document.getElementById('autor-edicao').value;
 
-            // Exibir uma janela de confirmação
-            const confirmacao = confirm("Você deseja salvar as alterações?");
+                // Exibir uma janela de confirmação
+                const confirmacao = confirm("Você deseja salvar as alterações?");
 
-            if (confirmacao) {
-                // Enviar requisição para salvar a edição do post
-                const response = await fetch(`/editar/${id}`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ conteudo: novoConteudo, autor: autorEdicao })
-                });
+                if (confirmacao) {
+                    // Enviar requisição para salvar a edição do post
+                    const response = await fetch(`/editar/${id}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ conteudo: novoConteudo, autor: autorEdicao })
+                    });
 
-                if (response.ok) {
-                    console.log(`Post ID: ${id} editado com sucesso`);
+                    if (response.ok) {
+                        console.log(`Post ID: ${id} editado com sucesso`);
 
-                    // Limpar o campo autor após salvar a edição
-                    document.getElementById('autor-edicao').value = '';
 
-                    // Atualizar os cards após edição
-                    buscar();
+                        document.getElementById('autor-edicao').value = '';
 
-                    // Exibir mensagem de sucesso
-                    alert("Alterações salvas com sucesso!");
+                        buscar();
 
-                    const editarModal = new bootstrap.Modal(document.getElementById('editarModal'));
-                    editarModal.hide();
+
+                        alert("Alterações salvas com sucesso!");
+
+                        const editarModal = new bootstrap.Modal(document.getElementById('editarModal'));
+                        editarModal.hide();
+                    } else {
+                        console.error('Erro ao salvar edição:', response.statusText);
+                    }
                 } else {
-                    console.error('Erro ao salvar edição:', response.statusText);
+                    console.log("Edição cancelada");
                 }
-            } else {
-                console.log("Edição cancelada");
+            } catch (error) {
+                console.error('Erro ao salvar edição:', error);
             }
-        } catch (error) {
-            console.error('Erro ao salvar edição:', error);
         }
-    }
 
-        // Chamar a função para carregar os cards quando a página carregar
+
         window.onload = buscar;
 
-        // Ouvinte de evento para capturar a tecla "Enter" pressionada no campo de entrada de texto
+
         document.getElementById('searchInput').addEventListener('keypress', function (e) {
             if (e.key === 'Enter') {
-                buscar(); // Chama a função de busca quando a tecla "Enter" for pressionada
+                buscar();
             }
+        });
+
+        document.getElementById('opcao-busca').addEventListener('change', function () {
+            buscar();
         });
 
     </script>

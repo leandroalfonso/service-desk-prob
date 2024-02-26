@@ -124,6 +124,16 @@
                         <input type="text" class="form-control" id="autor" placeholder="Ex: João da Silva">
 
                     </div>
+                    <div class="mb-3">
+                        <label for="autor">Requisição ou Incidente</label>
+                            <select id="opcao" class="form-select" aria-label="Default select example"> <!-- Adicionado o ID "opcao" -->
+                                <option selected>Selecione uma opção</option>
+                                <option value="1">Requisição</option>
+                                <option value="2">Incidente</option>
+                            </select>
+
+                    </div>
+                  
                     <button class="btn btn-primary" onclick="enviarDados()">Enviar Dados</button>
                     
                     <p id="mensagem"></p>
@@ -133,13 +143,14 @@
     </div>
 
     <script>
-        function enviarDados() {
+       function enviarDados() {
             const titulo = document.getElementById('titulo').value;
             const conteudo = document.getElementById('conteudo').value;
             const link = document.getElementById('link').value;
             const autor = document.getElementById('autor').value;
+            const opcao = document.getElementById('opcao').value; // Corrigido para 'opcao'
 
-          fetch('/insere-json', { // Rota relativa do backend
+            fetch('/insere-json', { // Rota relativa do backend
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -149,10 +160,10 @@
                     conteudo: conteudo,
                     id: Math.floor(Math.random() * 1000),
                     link: link,
-                    autor: autor
+                    autor: autor,
+                    opcao: opcao // Incluindo o valor selecionado do select
                 })
             })
-
                 .then(response => {
                     if (!response.ok) {
                         throw new Error('Falha ao enviar dados para o servidor');
@@ -172,6 +183,7 @@
                     document.getElementById('mensagem').innerText = 'Erro ao enviar dados para o servidor'; // Exibir mensagem de erro
                 });
         }
+
     </script>
 </body>
 
